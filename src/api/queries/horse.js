@@ -15,3 +15,25 @@ export const GET_HORSE = gql`
     }
   }
 `;
+
+export const ADD_HORSE = gql`
+  mutation addHorse($addHorseInput: any) {
+    addHorse(addHorseInput: $addHorseInput)
+    @rest(
+      type: "addHorse"
+      method: "PUT"
+      path: "horse"
+      bodyKey: "addHorseInput"
+    ) {
+      id
+      name
+      profile @type(name: "Profile") {
+        favouriteFood
+        physical @type(name: "Physical") {
+          height
+          weight
+        }
+      }
+    }
+  }
+`;
