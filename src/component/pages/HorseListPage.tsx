@@ -4,6 +4,7 @@ import Container from "@mui/material/Container";
 import Typography from "@mui/material/Typography";
 
 import ListHorses from "../organisms/ListHorses";
+import AddHorse from "../organisms/AddHorse";
 
 const HorseListPage = () => {
   return (
@@ -12,6 +13,7 @@ const HorseListPage = () => {
         <Typography variant="h2" component="div" gutterBottom>
           Horse
         </Typography>
+        <AddHorse />
         <ListHorses />
       </Box>
     </Container>
