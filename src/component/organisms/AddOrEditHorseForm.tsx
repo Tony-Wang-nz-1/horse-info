@@ -1,5 +1,6 @@
 import React from "react";
 import { useFormik } from "formik";
+import { gql } from "@apollo/client";
 import { isEmpty, isNil } from "ramda";
 import Button from "@mui/material/Button";
 import Box from "@mui/material/Box";
@@ -19,12 +20,44 @@ type AddOrEditHorseFormProps = {
   horse?: Horse;
 };
 
+const updateCache = (cache: any, field: any) =>
+  cache.modify({
+    fields: {
+      horse(existingHorses = []) {
+        const newHorseRef = cache.writeQuery({
+          query: gql`
+            query WriteHorse($id: Int!) {
+              horse(id: $id) {
+                id
+                name
+                profile {
+                  favouriteFood
+                  physical {
+                    height
+                    weight
+                  }
+                }
+              }
+            }
+          `,
+          data: { ...field },
+          variables: {
+            id: field.id,
+          },
+        });
+        return [...existingHorses, newHorseRef];
+      },
+    },
+  });
+
 const AddOrEditHorseForm: React.FC<AddOrEditHorseFormProps> = ({
   close,
   horse,
 }) => {
   const { id, name, profile } = horse || {};
   const [addHorse] = useMutation(ADD_HORSE, {
+    update: (cache, { data: { addHorse } }) =>
+      updateCache(cache, { data: { addHorse } }),
     onCompleted: () => {
       close();
     },
@@ -34,6 +67,8 @@ const AddOrEditHorseForm: React.FC<AddOrEditHorseFormProps> = ({
   });
 
   const [editHorse] = useMutation(EDIT_HORSE, {
+    update: (cache, { data: { editHorse } }) =>
+      updateCache(cache, { data: { editHorse } }),
     onCompleted: () => {
       close();
     },
