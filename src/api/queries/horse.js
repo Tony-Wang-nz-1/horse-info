@@ -37,3 +37,25 @@ export const ADD_HORSE = gql`
     }
   }
 `;
+
+export const EDIT_HORSE = gql`
+  mutation editHorse($editHorseInput: any) {
+    editHorse(editHorseInput: $editHorseInput)
+    @rest(
+      type: "editHorse"
+      method: "PUT"
+      path: "horse/{args.editHorseInput.id}"
+      bodyKey: "editHorseInput"
+    ) {
+      id
+      name
+      profile @type(name: "Profile") {
+        favouriteFood
+        physical @type(name: "Physical") {
+          height
+          weight
+        }
+      }
+    }
+  }
+`;

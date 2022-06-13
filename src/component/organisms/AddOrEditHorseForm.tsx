@@ -1,10 +1,12 @@
 import React from "react";
 import { useFormik } from "formik";
+import { isEmpty, isNil } from "ramda";
 import Button from "@mui/material/Button";
 import Box from "@mui/material/Box";
 import TextField from "@mui/material/TextField";
 import { useMutation } from "@apollo/client";
-import { ADD_HORSE } from "../../api/queries/horse";
+import { ADD_HORSE, EDIT_HORSE } from "../../api/queries/horse";
+import { Horse } from "./ListHorses";
 
 import * as yup from "yup";
 
@@ -12,12 +14,26 @@ const validationSchema = yup.object({
   name: yup.string().required("Name is required"),
 });
 
-type AddHorseFormProps = {
+type AddOrEditHorseFormProps = {
   close: () => void;
+  horse?: Horse;
 };
 
-const AddHorseForm: React.FC<AddHorseFormProps> = ({ close }) => {
+const AddOrEditHorseForm: React.FC<AddOrEditHorseFormProps> = ({
+  close,
+  horse,
+}) => {
+  const { id, name, profile } = horse || {};
   const [addHorse] = useMutation(ADD_HORSE, {
+    onCompleted: () => {
+      close();
+    },
+    onError: (err) => {
+      close();
+    },
+  });
+
+  const [editHorse] = useMutation(EDIT_HORSE, {
     onCompleted: () => {
       close();
     },
@@ -29,27 +45,45 @@ const AddHorseForm: React.FC<AddHorseFormProps> = ({ close }) => {
   const formik = useFormik({
     enableReinitialize: true,
     initialValues: {
-      name: "",
-      favouriteFood: "",
-      height: 0,
-      weight: 0,
+      name: name || "",
+      favouriteFood: profile?.favouriteFood || "",
+      height: profile?.physical?.height || 0,
+      weight: profile?.physical?.weight || 0,
     },
     validationSchema,
     onSubmit: ({ name, favouriteFood, height, weight }) => {
-      addHorse({
-        variables: {
-          addHorseInput: {
-            name,
-            profile: {
-              favouriteFood,
-              physical: {
-                height,
-                weight,
+      if (!isEmpty(horse) && !isNil(horse)) {
+        editHorse({
+          variables: {
+            editHorseInput: {
+              id,
+              name,
+              profile: {
+                favouriteFood,
+                physical: {
+                  height,
+                  weight,
+                },
               },
             },
           },
-        },
-      });
+        });
+      } else {
+        addHorse({
+          variables: {
+            addHorseInput: {
+              name,
+              profile: {
+                favouriteFood,
+                physical: {
+                  height,
+                  weight,
+                },
+              },
+            },
+          },
+        });
+      }
       close();
     },
   });
@@ -105,4 +139,4 @@ const AddHorseForm: React.FC<AddHorseFormProps> = ({ close }) => {
   );
 };
 
-export default AddHorseForm;
+export default AddOrEditHorseForm;

@@ -4,11 +4,16 @@ import DialogActions from "@mui/material/DialogActions";
 import DialogContent from "@mui/material/DialogContent";
 import DialogContentText from "@mui/material/DialogContentText";
 import DialogTitle from "@mui/material/DialogTitle";
-import Button from "@mui/material/Button";
+import EditIcon from "@mui/icons-material/Edit";
 
 import AddOrEditHorseForm from "./AddOrEditHorseForm";
+import { Horse } from "./ListHorses";
 
-const AddHorse = () => {
+type EditHorseProps = {
+  horse: Horse;
+};
+
+const EditHorse: React.FC<EditHorseProps> = ({ horse }) => {
   const [open, setOpen] = React.useState(false);
 
   const handleClickOpen = () => {
@@ -21,14 +26,12 @@ const AddHorse = () => {
 
   return (
     <div>
-      <Button variant="contained" onClick={handleClickOpen}>
-        Add
-      </Button>
+      <EditIcon onClick={handleClickOpen} />
       <Dialog open={open} onClose={handleClose}>
-        <DialogTitle>Add horse</DialogTitle>
+        <DialogTitle>Edit horse</DialogTitle>
         <DialogContent>
-          <DialogContentText gutterBottom>Add a new horse</DialogContentText>
-          <AddOrEditHorseForm close={handleClose} />
+          <DialogContentText gutterBottom>Edit horse</DialogContentText>
+          <AddOrEditHorseForm close={handleClose} horse={horse} />
         </DialogContent>
         <DialogActions></DialogActions>
       </Dialog>
@@ -36,4 +39,4 @@ const AddHorse = () => {
   );
 };
 
-export default AddHorse;
+export default EditHorse;

@@ -14,6 +14,8 @@ import Collapse from "@mui/material/Collapse";
 
 import { GET_HORSE } from "../../api/queries/horse";
 
+import EditHorse from "./EditHorse";
+
 export type Horse = {
   id: string;
   name?: string;
@@ -53,6 +55,9 @@ const Row: React.FC<ListHorsesProps> = ({ horse }) => {
         </TableCell>
         <TableCell component="th" scope="row">
           {horse.name}
+        </TableCell>
+        <TableCell>
+          <EditHorse horse={horse} />
         </TableCell>
       </TableRow>
       <TableRow>
