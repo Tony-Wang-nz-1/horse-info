@@ -11,9 +11,9 @@ import IconButton from "@mui/material/IconButton";
 import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown";
 import KeyboardArrowUpIcon from "@mui/icons-material/KeyboardArrowUp";
 import Collapse from "@mui/material/Collapse";
+import TablePagination from "@mui/material/TablePagination";
 
 import { GET_HORSE } from "../../api/queries/horse";
-
 import EditHorse from "./EditHorse";
 
 export type Horse = {
@@ -93,10 +93,23 @@ const Row: React.FC<ListHorsesProps> = ({ horse }) => {
 };
 
 const ListHorses = () => {
+  const [page, setPage] = React.useState(0);
+  const [rowsPerPage, setRowsPerPage] = React.useState(10);
   const { data, loading, error } = useQuery(GET_HORSE);
 
   if (loading) return <p>Loading...</p>;
   if (error) return <p>Error! ${error.message}</p>;
+
+  const handleChangePage = (event: unknown, newPage: number) => {
+    setPage(newPage);
+  };
+
+  const handleChangeRowsPerPage = (
+    event: React.ChangeEvent<HTMLInputElement>
+  ) => {
+    setRowsPerPage(+event.target.value);
+    setPage(0);
+  };
 
   return (
     <>
@@ -111,12 +124,22 @@ const ListHorses = () => {
           </TableHead>
           <TableBody>
             {data &&
-              data.horse.map((horse: Horse) => (
-                <Row key={horse.id} horse={horse} />
-              ))}
+              data.horse &&
+              data.horse
+                .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
+                .map((horse: Horse) => <Row key={horse.id} horse={horse} />)}
           </TableBody>
         </Table>
       </TableContainer>
+      <TablePagination
+        rowsPerPageOptions={[10]}
+        component="div"
+        count={data?.horse ? data?.horse?.length : 0}
+        rowsPerPage={rowsPerPage}
+        page={page}
+        onPageChange={handleChangePage}
+        onRowsPerPageChange={handleChangeRowsPerPage}
+      />
     </>
   );
 };
